@@ -1,0 +1,23 @@
+stages:
+  - build
+  - test
+
+variables:
+  DOCKER_COMPOSE_VERSION: 2.23.3
+  
+services:
+  - docker:dind
+
+build:
+  stage: build
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY/devops50951/k8s-appdatat/shopee:test_case .
+    - docker push $CI_REGISTRY/devops50951/k8s-appdatat/shopee:test_case
+
+test:
+  stage: test
+  script:
+    - docker run $CI_REGISTRY/devops50951/k8s-appdatat/shopee:test_case python manage.py test
+  only:
+    - master
